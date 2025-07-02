@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    runtime: nvidia
+    environment:
+      - OLLAMA_ORIGINS=*
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./models:/root/.ollama/models
+    command: >
+      sh -c "
+        if [ ! -f /root/.ollama/models/$OLLAMA_MODEL.gguf ]; then
+          echo '⛔ GGUF missing. Run bootstrap.sh or mount model file.' && exit 1
+        fi &&
+        ollama serve
+      "
+
+  # optional GPU metrics exporter
+  dcgm-exporter:
+    image: nvidia/dcgm-exporter:3.3.5-2.8.0-ubuntu22.04
+    runtime: nvidia
+    restart: unless-stopped
+    ports: ["9400:9400"]
+    deploy:
+      resources:
+        reservations:
+          devices: [{ capabilities: ["gpu"] }]

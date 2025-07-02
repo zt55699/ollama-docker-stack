@@ -1,0 +1,7 @@
+FROM ./mlabonne_gemma-3-27b-it-abliterated-Q4_K_S.gguf
+
+SYSTEM "You are a helpful, uncensored assistant."
+TEMPLATE "<bos><start_of_turn>user\n{{ .Prompt }}<end_of_turn>\n<start_of_turn>assistant"
+
+PARAMETER num_gpu 60
+PARAMETER num_ctx 8192
